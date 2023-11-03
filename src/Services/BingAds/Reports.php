@@ -269,6 +269,58 @@ class Reports
         return (new ReportDownload($this->serviceProxy, $reportRequestId));
     }
 
+    /**
+     * buildAdGroupReportHourly()
+     *
+     *
+     */
+    public function buildAdGroupReportHourly()
+    {
+        $report                         = new AdGroupPerformanceReportRequest();
+        $report->ReportName             = 'Ad Group Performance Report';
+        $report->Format                 = ReportFormat::Csv;
+        $report->ReturnOnlyCompleteData = false;
+        $report->Aggregation            = ReportAggregation::Hourly;
+
+        $report->Scope                  = new AdGroupReportScope();
+        $report->Scope->AccountIds      = [$this->service->getClientId()];
+
+        $report->Time                               = new ReportTime();
+        $report->Time->CustomDateRangeStart         = new Date();
+        $report->Time->CustomDateRangeStart->Day    = date('d', strtotime($this->dateRange[0]));
+        $report->Time->CustomDateRangeStart->Month  = date('m', strtotime($this->dateRange[0]));
+        $report->Time->CustomDateRangeStart->Year   = date('Y', strtotime($this->dateRange[0]));
+
+        $report->Time->CustomDateRangeEnd           = new Date();
+        $report->Time->CustomDateRangeEnd->Day      = date('d', strtotime($this->dateRange[1]));
+        $report->Time->CustomDateRangeEnd->Month    = date('m', strtotime($this->dateRange[1]));
+        $report->Time->CustomDateRangeEnd->Year     = date('Y', strtotime($this->dateRange[1]));
+
+        if (!empty($this->fields)) {
+            $report->Columns = $this->fields;
+        } else {
+            $report->Columns = [
+                AdGroupPerformanceReportColumn::TimePeriod,
+                AdGroupPerformanceReportColumn::AccountId,
+                AdGroupPerformanceReportColumn::CampaignId,
+                AdGroupPerformanceReportColumn::CampaignName,
+                AdGroupPerformanceReportColumn::AdGroupId,
+                AdGroupPerformanceReportColumn::AdGroupName,
+                AdGroupPerformanceReportColumn::Clicks,
+                AdGroupPerformanceReportColumn::Impressions,
+                AdGroupPerformanceReportColumn::Spend,
+                AdGroupPerformanceReportColumn::Conversions,
+                AdGroupPerformanceReportColumn::Revenue,
+                AdGroupPerformanceReportColumn::AveragePosition
+            ];
+        }
+
+        $encodedReport   = new SoapVar($report, SOAP_ENC_OBJECT, 'AdGroupPerformanceReportRequest', $this->serviceProxy->GetNamespace());
+        $reportRequestId = $this->submitGenerateReport($encodedReport)->ReportRequestId;
+
+        return (new ReportDownload($this->serviceProxy, $reportRequestId));
+    }
+
 
     /**
      * buildFinalUrlReport()
@@ -656,6 +708,16 @@ class Reports
     public function getAdGroupReport()
     {
         return $this->buildAdGroupReport()->toCollection();
+    }
+
+    /**
+     * getAdGroupReport()
+     *
+     *
+     */
+    public function getAdGroupReportHourly()
+    {
+        return $this->buildAdGroupReportHourly()->toCollection();
     }
 
 
