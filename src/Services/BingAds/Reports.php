@@ -279,6 +279,7 @@ class Reports
         $report                         = new AdGroupPerformanceReportRequest();
         $report->ReportName             = 'Ad Group Performance Report';
         $report->Format                 = ReportFormat::Csv;
+        $report->FormatVersion          = '2.0';
         $report->ReturnOnlyCompleteData = false;
         $report->Aggregation            = ReportAggregation::Hourly;
 
